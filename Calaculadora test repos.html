@@ -560,6 +560,7 @@
             const nominalPatrimonyData = [];
             const realPatrimonyData = [];
             const inflationOnlyData = [];
+            const savingsOnlyNominalData = [];
 
             for (let i = 0; i <= years; i++) {
                 labels.push(`Año ${i}`);
@@ -570,11 +571,12 @@
                 nominalPatrimonyData.push(nominalPatrimony);
                 realPatrimonyData.push(realPatrimony);
                 inflationOnlyData.push(inflationOnlyValue);
+                savingsOnlyNominalData.push(savingsOnlyNominal);
 
                 // Calculate for next year
                 portfolioValue = (portfolioValue + annualContribution) * (1 + sp500Return);
                 nonInvestedSavings = (nonInvestedSavings + annualNewSavings) * (1 + savingsReturn);
-                savingsOnlyNominal = (savingsOnlyNominal + totalAnnualSavings); // No return, just accumulation
+                savingsOnlyNominal = (savingsOnlyNominal + totalAnnualSavings);
                 if (i < years) {
                     totalContributions += annualContribution;
                 }
@@ -585,9 +587,10 @@
             const finalNominalPatrimony = nominalPatrimonyData[nominalPatrimonyData.length - 1];
             const finalRealPatrimony = realPatrimonyData[realPatrimonyData.length - 1];
             const finalInflationOnlyValue = inflationOnlyData[inflationOnlyData.length - 1];
-            const finalSavingsOnlyNominal = savingsOnlyNominal;
+            const finalSavingsOnlyNominal = savingsOnlyNominalData[savingsOnlyNominalData.length - 1];
             const inflationLoss = finalSavingsOnlyNominal - finalInflationOnlyValue;
             const realProfit = finalRealPatrimony - totalContributions;
+            const annualInflationLoss = years > 0 ? inflationLoss / years : 0;
 
             projectionSummary.innerHTML = `
                 <div class="text-left space-y-4">
@@ -654,13 +657,22 @@
                                 <dd class="font-bold text-red-600 text-base">${formatCurrency(finalInflationOnlyValue)}</dd>
                             </div>
                             <div class="flex justify-between items-center">
-                                <dt class="text-gray-600 flex items-center">Poder de compra perdido
+                                <dt class="text-gray-600 flex items-center">Poder de compra perdido (total)
                                     <div class="info-icon">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
                                         <span class="tooltip">Esta es la cantidad de valor que la inflación le ha 'robado' a tus ahorros por no haberlos invertido. Es la diferencia entre lo que ahorraste y lo que realmente vale.</span>
                                     </div>
                                 </dt>
                                 <dd class="font-bold text-red-600 text-base">-${formatCurrency(inflationLoss)}</dd>
+                            </div>
+                             <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Pérdida anual promedio
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Es la media de poder de compra que has perdido cada año por culpa de la inflación al no invertir.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-bold text-red-600 text-base">-${formatCurrency(annualInflationLoss)}</dd>
                             </div>
                         </dl>
                     </div>
