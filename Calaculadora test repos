@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Futuro Financiero y Guía de Inversión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .step-card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .input-label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .btn-primary {
+            width: 100%;
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 700;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+             width: 100%;
+            background-color: #6b7280;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-right: 1rem;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .result-item {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+        .result-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        .result-description {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-top: 0.5rem;
+        }
+        .profile-card {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .profile-card.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .info-icon {
+            width: 1rem;
+            height: 1rem;
+            margin-left: 0.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            position: relative;
+        }
+        .tooltip {
+            visibility: hidden;
+            width: 250px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: 400;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        .info-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Calculadora de Futuro Financiero</h1>
+            <p class="mt-4 text-lg text-gray-600">Una guía interactiva para construir tu patrimonio y vencer a la inflación.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Columna de Entradas -->
+            <div class="space-y-8">
+                <!-- Paso 1: Datos Financieros -->
+                <div class="step-card">
+                    <h2 class="section-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Paso 1: Tu Situación Actual
+                    </h2>
+                    <div class="input-group">
+                        <label for="totalSavings" class="input-label">Ahorros Totales Actuales (€)
+                            <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">Introduce todo el dinero que tienes ahorrado en este momento, incluyendo cuentas corrientes y remuneradas.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="totalSavings" class="input-field" placeholder="Ej: 14000" value="14000">
+                    </div>
+                    <div class="input-group">
+                        <label for="mainIncome" class="input-label">Ingreso Mensual Principal (€)
+                             <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">Tu nómina o fuente de ingresos más estable y segura.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="mainIncome" class="input-field" placeholder="Ej: 1900" value="1900">
+                    </div>
+                    <div class="input-group">
+                        <label for="secondIncome" class="input-label">Ingreso Mensual Secundario (€)
+                             <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">Otros ingresos que puedan ser menos estables. Si no tienes, déjalo en 0.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="secondIncome" class="input-field" placeholder="Ej: 1000" value="1000">
+                    </div>
+                </div>
+
+                <!-- Paso 2: Colchón de Seguridad -->
+                <div class="step-card">
+                    <h2 class="section-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        Paso 2: Tu Red de Seguridad
+                    </h2>
+                    <div class="input-group">
+                        <label for="essentialExpenses" class="input-label">Gastos Esenciales Mensuales (€)
+                             <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">La suma de todos tus gastos imprescindibles para vivir: alquiler/hipoteca, facturas, comida, transporte, etc.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="essentialExpenses" class="input-field" placeholder="Alquiler, facturas, comida..." value="1200">
+                    </div>
+                     <div class="input-group">
+                        <label for="variableExpensesMargin" class="input-label">Margen para Gastos Variables: <span id="variableExpensesMarginValue" class="font-bold text-blue-600">25</span>%
+                             <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">Para que el plan sea realista, estimamos un margen extra para gastos no esenciales (ocio, caprichos). Un 25% es un valor prudente. Ajústalo a tu estilo de vida.</span>
+                            </div>
+                        </label>
+                        <input type="range" id="variableExpensesMargin" class="w-full" min="0" max="50" step="5" value="25">
+                    </div>
+                    <div class="input-group">
+                        <label for="safetyNetMonths" class="input-label">Meses para tu Colchón de Seguridad: <span id="safetyNetMonthsValue" class="font-bold text-blue-600">6</span>
+                             <div class="info-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                <span class="tooltip">Se recomienda tener entre 3 y 6 meses de gastos cubiertos. Dada la volatilidad de un ingreso, 6 meses o más es una opción prudente.</span>
+                            </div>
+                        </label>
+                        <input type="range" id="safetyNetMonths" class="w-full" min="3" max="12" step="1" value="6">
+                    </div>
+                </div>
+
+                <!-- Paso 3: Estrategia de Inversión -->
+                <div class="step-card">
+                    <h2 class="section-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Paso 3: Elige tu Perfil de Inversor
+                        <div class="info-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                            <span class="tooltip">Tu perfil define qué parte de tu dinero "sobrante" se invierte para crecer y qué parte se queda líquida para darte seguridad. Un perfil más agresivo busca mayor crecimiento a cambio de mayor riesgo.</span>
+                        </div>
+                    </h2>
+                    <div id="investmentProfile" class="space-y-4">
+                        <label class="profile-card flex items-center">
+                            <input type="radio" name="profile" value="25,30" class="mr-4" checked>
+                            <div>
+                                <p class="font-bold flex items-center">Conservador
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Ideal si priorizas la seguridad y tener dinero disponible. Recomendado si no te gustan los riesgos, tienes un horizonte temporal corto o tu situación económica es ajustada.</span>
+                                    </div>
+                                </p>
+                                <p class="text-sm text-gray-600">Invierte un <strong>25%</strong> del excedente inicial y un <strong>30%</strong> de tu ahorro mensual.</p>
+                            </div>
+                        </label>
+                        <label class="profile-card flex items-center">
+                            <input type="radio" name="profile" value="50,50" class="mr-4">
+                            <div>
+                                <p class="font-bold flex items-center">Moderado
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">El punto de equilibrio. Busca un buen crecimiento sin renunciar a una buena cantidad de ahorro líquido. Es el perfil más recomendado para la mayoría de personas que empiezan.</span>
+                                    </div>
+                                </p>
+                                <p class="text-sm text-gray-600">Invierte un <strong>50%</strong> del excedente inicial y un <strong>50%</strong> de tu ahorro mensual.</p>
+                            </div>
+                        </label>
+                        <label class="profile-card flex items-center">
+                            <input type="radio" name="profile" value="75,70" class="mr-4">
+                            <div>
+                                <p class="font-bold flex items-center">Agresivo
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Busca maximizar el crecimiento a largo plazo. Recomendado si tienes un horizonte temporal largo (más de 10 años), alta tolerancia al riesgo y una situación económica estable.</span>
+                                    </div>
+                                </p>
+                                <p class="text-sm text-gray-600">Invierte un <strong>75%</strong> del excedente inicial y un <strong>70%</strong> de tu ahorro mensual.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <button id="calculateButton" class="btn-primary">Calcular Mi Plan Financiero</button>
+            </div>
+
+            <!-- Columna de Resultados -->
+            <div id="resultsPanel" class="hidden">
+                <div class="result-card">
+                    <h2 class="section-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Tu Guía de Inversión Personalizada
+                    </h2>
+                    
+                    <div id="planContainer" class="space-y-4">
+                        <!-- Los resultados se inyectarán aquí -->
+                    </div>
+                </div>
+                
+                <!-- Proyección a Futuro -->
+                <div class="step-card mt-8">
+                    <h2 class="section-title">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                        Proyección de Crecimiento
+                    </h2>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="input-group">
+                            <label for="projectionYears" class="input-label text-sm">Años</label>
+                            <input type="number" id="projectionYears" class="input-field" value="20">
+                        </div>
+                        <div class="input-group">
+                            <label for="sp500Return" class="input-label text-sm">Retorno S&P 500 (%/año)</label>
+                            <input type="number" id="sp500Return" class="input-field" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label for="inflationRate" class="input-label text-sm">Inflación (%/año)
+                                <div class="info-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                    <span class="tooltip">La inflación es el aumento general de precios. Hace que tu dinero pierda valor con el tiempo. Un 3% es una media histórica habitual.</span>
+                                </div>
+                            </label>
+                            <input type="number" id="inflationRate" class="input-field" value="3">
+                        </div>
+                        <div class="input-group">
+                            <label for="savingsReturn" class="input-label text-sm">Rentabilidad Ahorro (%/año)
+                                <div class="info-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                    <span class="tooltip">El interés que te da tu cuenta de ahorro o depósito por el dinero que no está invertido en bolsa (tu colchón, etc.). Ayuda a reducir el impacto de la inflación.</span>
+                                </div>
+                            </label>
+                            <input type="number" id="savingsReturn" class="input-field" value="1.25">
+                        </div>
+                    </div>
+                    <button id="recalculateProjectionButton" class="btn-secondary mb-4">Recalcular Proyección</button>
+                    <canvas id="projectionChart"></canvas>
+                    <div id="projectionSummary" class="mt-6"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center mt-12 text-sm text-gray-500">
+            <p><strong>Aviso Importante:</strong> Esta calculadora es una herramienta educativa basada en principios financieros y la estrategia analizada. No constituye asesoramiento financiero profesional. Las proyecciones de mercado son estimaciones y no están garantizadas. Consulta con un asesor certificado antes de tomar decisiones de inversión.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const calculateButton = document.getElementById('calculateButton');
+        const recalculateProjectionButton = document.getElementById('recalculateProjectionButton');
+        const resultsPanel = document.getElementById('resultsPanel');
+        const planContainer = document.getElementById('planContainer');
+        const projectionChartCanvas = document.getElementById('projectionChart');
+        const projectionSummary = document.getElementById('projectionSummary');
+
+        const safetyNetSlider = document.getElementById('safetyNetMonths');
+        const safetyNetValueDisplay = document.getElementById('safetyNetMonthsValue');
+        safetyNetSlider.addEventListener('input', () => {
+            safetyNetValueDisplay.textContent = safetyNetSlider.value;
+        });
+        
+        const variableExpensesSlider = document.getElementById('variableExpensesMargin');
+        const variableExpensesValueDisplay = document.getElementById('variableExpensesMarginValue');
+        variableExpensesSlider.addEventListener('input', () => {
+            variableExpensesValueDisplay.textContent = variableExpensesSlider.value;
+        });
+
+        const profileCards = document.querySelectorAll('.profile-card');
+        profileCards.forEach(card => {
+            card.addEventListener('click', () => {
+                profileCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                card.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+        document.querySelector('.profile-card input[checked]').parentElement.classList.add('selected');
+
+        let projectionChartInstance = null;
+        let projectionParams = {}; // Store params for recalculation
+
+        calculateButton.addEventListener('click', () => {
+            const totalSavings = parseFloat(document.getElementById('totalSavings').value) || 0;
+            const mainIncome = parseFloat(document.getElementById('mainIncome').value) || 0;
+            const secondIncome = parseFloat(document.getElementById('secondIncome').value) || 0;
+            const essentialExpenses = parseFloat(document.getElementById('essentialExpenses').value) || 0;
+            const safetyNetMonths = parseInt(document.getElementById('safetyNetMonths').value);
+            const variableExpensesMargin = parseInt(document.getElementById('variableExpensesMargin').value);
+            
+            const selectedProfile = document.querySelector('input[name="profile"]:checked').value;
+            const [investmentPercentage, contributionPercentage] = selectedProfile.split(',').map(Number);
+
+            const safetyNet = essentialExpenses * safetyNetMonths;
+            const surplusCapital = totalSavings - safetyNet;
+            
+            const initialInvestmentTotal = surplusCapital > 0 ? surplusCapital * (investmentPercentage / 100) : 0;
+            const dcaMonthly = initialInvestmentTotal / 12;
+
+            const totalIncomeA = mainIncome + secondIncome;
+            const totalIncomeB = mainIncome;
+            
+            const totalExpenses = essentialExpenses * (1 + variableExpensesMargin / 100); 
+
+            const monthlySavingsA = totalIncomeA - totalExpenses;
+            const monthlySavingsB = totalIncomeB - totalExpenses;
+
+            const monthlyContributionA = monthlySavingsA > 0 ? monthlySavingsA * (contributionPercentage / 100) : 0;
+            const monthlyContributionB = monthlySavingsB > 0 ? monthlySavingsB * (contributionPercentage / 100) : 0;
+            
+            const totalFirstYearMonthly = dcaMonthly + monthlyContributionA;
+            
+            const liquidityFromSurplus = surplusCapital > 0 ? surplusCapital - initialInvestmentTotal : 0;
+            const monthlyLiquidity = monthlySavingsA > 0 ? monthlySavingsA - monthlyContributionA : 0;
+
+
+            displayResults({
+                safetyNet,
+                surplusCapital,
+                initialInvestmentTotal,
+                dcaMonthly,
+                monthlyContributionA,
+                monthlyContributionB,
+                totalFirstYearMonthly,
+                liquidityFromSurplus,
+                monthlyLiquidity,
+                totalExpenses,
+                monthlySavingsA
+            });
+            
+            projectionParams = {
+                initialInvestment: initialInvestmentTotal,
+                monthlyContribution: monthlyContributionA,
+                totalSavings,
+                monthlySavings: monthlySavingsA
+            };
+            
+            runProjection(projectionParams);
+            
+            resultsPanel.classList.remove('hidden');
+            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        recalculateProjectionButton.addEventListener('click', () => {
+            if (Object.keys(projectionParams).length > 0) {
+                runProjection(projectionParams);
+            } else {
+                alert("Por favor, calcula primero tu plan financiero completo.");
+            }
+        });
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+        }
+
+        function displayResults(data) {
+            planContainer.innerHTML = `
+                <div class="result-item">
+                    <p class="result-title">Paso 1: Tu Colchón de Seguridad</p>
+                    <p class="result-value">${formatCurrency(data.safetyNet)}</p>
+                    <p class="result-description">Este es el dinero que debes tener líquido y accesible. <strong>No se invierte.</strong> Es tu prioridad número uno.</p>
+                </div>
+                
+                ${data.surplusCapital > 0 ? `
+                <div class="result-item">
+                    <p class="result-title">Paso 2: Tu Capacidad de Ahorro Real</p>
+                    <p class="result-value">${formatCurrency(data.monthlySavingsA)} / mes</p>
+                    <p class="result-description">Calculado a partir de tus ingresos menos tus gastos totales estimados de <strong>${formatCurrency(data.totalExpenses)}</strong> (esenciales + variables).</p>
+                </div>
+                
+                <div class="result-item">
+                    <p class="result-title">Paso 3: Plan de Inversión Inicial (Año 1)</p>
+                    <p class="result-value">${formatCurrency(data.dcaMonthly)} / mes (durante 12 meses)</p>
+                    <p class="result-description">Invertirás esta cantidad mensual en el S&P 500 hasta alcanzar tu objetivo de ${formatCurrency(data.initialInvestmentTotal)} (el ${document.querySelector('input[name="profile"]:checked').value.split(',')[0]}% de tu excedente de ${formatCurrency(data.surplusCapital)}).</p>
+                </div>
+
+                <div class="result-item">
+                    <p class="result-title">Paso 4: Plan de Aportaciones Periódicas</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="font-semibold text-lg text-green-600">${formatCurrency(data.monthlyContributionA)} / mes</p>
+                            <p class="result-description"><strong>Escenario Normal:</strong> Tu aportación mensual al S&P 500, basada en tu capacidad de ahorro.</p>
+                        </div>
+                        <div>
+                             <p class="font-semibold text-lg text-amber-600">${formatCurrency(data.monthlyContributionB)} / mes</p>
+                            <p class="result-description"><strong>Escenario de Contingencia:</strong> Tu aportación se ajusta a esta cifra si pierdes tu ingreso secundario.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-item bg-indigo-50 border border-indigo-200">
+                    <p class="result-title">Paso 5: Tu Aportación Total Mensual (Primer Año)</p>
+                    <p class="result-value text-indigo-600">${formatCurrency(data.totalFirstYearMonthly)}</p>
+                    <p class="result-description">Durante los primeros 12 meses, tu aportación total será la suma de tu inversión inicial (DCA) y tu aportación periódica. <br>(${formatCurrency(data.dcaMonthly)} + ${formatCurrency(data.monthlyContributionA)} = ${formatCurrency(data.totalFirstYearMonthly)})</p>
+                </div>
+
+                <div class="result-item bg-teal-50 border border-teal-200">
+                    <p class="result-title">Paso 6: Tu Ahorro Líquido Adicional</p>
+                     <p class="result-description">Este es el dinero que NO se invierte y que refuerza tu cuenta remunerada, dándote más seguridad y liquidez.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div>
+                            <p class="font-semibold text-lg text-teal-600">${formatCurrency(data.liquidityFromSurplus)}</p>
+                            <p class="result-description"><strong>Liquidez Inicial:</strong> Parte de tu excedente que se queda en la cuenta de ahorro.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-lg text-teal-600">${formatCurrency(data.monthlyLiquidity)} / mes</p>
+                            <p class="result-description"><strong>Ahorro Líquido Mensual:</strong> Parte de tu ahorro mensual que se queda en la cuenta de ahorro.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-item bg-blue-50 border border-blue-200">
+                    <p class="result-title">Paso 7: Estrategia a Largo Plazo (Año 2 en adelante)</p>
+                    <div class="space-y-3">
+                        <p class="result-description"><strong>1. Aportación Continuada:</strong> Después del primer año, tu única aportación a la inversión será la periódica (${formatCurrency(data.monthlyContributionA)} en el escenario normal).</p>
+                        <p class="result-description"><strong>2. Aumento del Ahorro Líquido:</strong> Al terminar el plan de inversión inicial, tu ahorro líquido mensual aumenta. A partir del segundo año, los <strong>${formatCurrency(data.monthlyLiquidity)}</strong> que ahorras cada mes se quedarán íntegramente en tu cuenta remunerada.</p>
+                        <p class="result-description"><strong>3. Revisión Anual:</strong> Para seguir ganando a la inflación a medida que tu patrimonio crece, es crucial que cada año vuelvas a esta calculadora con tus ahorros totales actualizados. Esto te permitirá ajustar tus aportaciones si es necesario y asegurar que tu plan sigue siendo efectivo.</p>
+                    </div>
+                </div>
+                ` : `
+                <div class="result-item bg-amber-100 border border-amber-300">
+                    <p class="result-title text-amber-800">Acción Prioritaria</p>
+                    <p class="result-value text-amber-700">Construir tu Colchón</p>
+                    <p class="result-description text-amber-600">Tus ahorros actuales no cubren el colchón de seguridad recomendado. Tu prioridad número uno es ahorrar hasta alcanzar los ${formatCurrency(data.safetyNet)} antes de empezar a invertir.</p>
+                </div>
+                `}
+            `;
+        }
+        
+        function runProjection(params) {
+            const years = parseInt(document.getElementById('projectionYears').value);
+            const sp500Return = parseFloat(document.getElementById('sp500Return').value) / 100;
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
+            const savingsReturn = parseFloat(document.getElementById('savingsReturn').value) / 100;
+            
+            let portfolioValue = params.initialInvestment;
+            let nonInvestedSavings = params.totalSavings > params.initialInvestment ? params.totalSavings - params.initialInvestment : 0;
+            let totalContributions = params.initialInvestment;
+            let savingsOnlyNominal = params.totalSavings;
+            
+            const annualContribution = params.monthlyContribution * 12;
+            const totalAnnualSavings = params.monthlySavings > 0 ? params.monthlySavings * 12 : 0;
+            const annualNewSavings = totalAnnualSavings - annualContribution;
+            const totalMonthlySavings = params.monthlySavings > 0 ? params.monthlySavings : 0;
+
+            const labels = [];
+            const nominalPatrimonyData = [];
+            const realPatrimonyData = [];
+            const inflationOnlyData = [];
+
+            for (let i = 0; i <= years; i++) {
+                labels.push(`Año ${i}`);
+                const nominalPatrimony = portfolioValue + nonInvestedSavings;
+                const realPatrimony = nominalPatrimony / Math.pow(1 + inflationRate, i);
+                const inflationOnlyValue = savingsOnlyNominal / Math.pow(1 + inflationRate, i);
+                
+                nominalPatrimonyData.push(nominalPatrimony);
+                realPatrimonyData.push(realPatrimony);
+                inflationOnlyData.push(inflationOnlyValue);
+
+                // Calculate for next year
+                portfolioValue = (portfolioValue + annualContribution) * (1 + sp500Return);
+                nonInvestedSavings = (nonInvestedSavings + annualNewSavings) * (1 + savingsReturn);
+                savingsOnlyNominal = (savingsOnlyNominal + totalAnnualSavings); // No return, just accumulation
+                if (i < years) {
+                    totalContributions += annualContribution;
+                }
+            }
+            
+            updateChart(labels, nominalPatrimonyData, realPatrimonyData, inflationOnlyData);
+            
+            const finalNominalPatrimony = nominalPatrimonyData[nominalPatrimonyData.length - 1];
+            const finalRealPatrimony = realPatrimonyData[realPatrimonyData.length - 1];
+            const finalInflationOnlyValue = inflationOnlyData[inflationOnlyData.length - 1];
+            const finalSavingsOnlyNominal = savingsOnlyNominal;
+            const inflationLoss = finalSavingsOnlyNominal - finalInflationOnlyValue;
+            const realProfit = finalRealPatrimony - totalContributions;
+
+            projectionSummary.innerHTML = `
+                <div class="text-left space-y-4">
+                    <div class="p-4 rounded-lg bg-gray-100">
+                        <p class="font-semibold text-gray-700">Explicación de la Gráfica</p>
+                        <p class="text-sm text-gray-600 mt-1">
+                        La gráfica muestra tres escenarios:
+                        <ul class="list-disc list-inside mt-2">
+                            <li><strong class="text-blue-600">Línea Azul:</strong> El dinero total que tendrías (lo que verías en el banco y en tu inversión).</li>
+                            <li><strong class="text-green-600">Línea Verde:</strong> Tu poder de compra real. Es la línea más importante, ya que representa cuánto vale de verdad tu dinero después de descontar la inflación.</li>
+                            <li><strong class="text-red-600">Línea Roja:</strong> Lo que le pasaría a tu dinero si solo lo ahorraras en una cuenta corriente (sin invertir), viendo cómo la inflación reduce su valor.</li>
+                        </ul>
+                        </p>
+                    </div>
+                    
+                    <div class="p-4 rounded-lg bg-gray-100">
+                        <p class="font-semibold text-gray-700">Resumen en ${years} años:</p>
+                        <dl class="mt-2 space-y-2 text-sm">
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Dinero total aportado por ti
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Es la suma total del dinero que ha salido de tu bolsillo para la inversión a lo largo de todos los años.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-semibold text-gray-900">${formatCurrency(totalContributions)}</dd>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Valor total de tu dinero (bruto)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Esta es la cifra total que verías en tu cuenta de inversión y de ahorro al final del periodo, sin tener en cuenta el efecto de la inflación.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-semibold text-blue-600">${formatCurrency(finalNominalPatrimony)}</dd>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Valor Real de tu Patrimonio (invirtiendo)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Esta es la cifra más importante. Representa cuánto vale realmente tu patrimonio total del futuro, pero 'traducido' al poder de compra que tiene el dinero hoy.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-bold text-green-600 text-base">${formatCurrency(finalRealPatrimony)}</dd>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Ganancia Neta Real (después de inflación)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Este es el beneficio real que has obtenido. Se calcula restando el dinero que aportaste de tu 'Valor Real'. Muestra cuánto has crecido por encima de la inflación.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-bold text-green-600 text-base">${formatCurrency(realProfit)}</dd>
+                            </div>
+                            <hr class="my-2">
+                             <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Valor Real (sólo ahorrando <span class="font-normal text-xs ml-1">con ${formatCurrency(totalMonthlySavings)}/mes</span>)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Este es el poder de compra que tendría tu dinero si, en lugar de invertir, simplemente hubieras acumulado todos tus ahorros en una cuenta corriente sin rentabilidad. Muestra el coste de la inacción.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-bold text-red-600 text-base">${formatCurrency(finalInflationOnlyValue)}</dd>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-600 flex items-center">Poder de compra perdido
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Esta es la cantidad de valor que la inflación le ha 'robado' a tus ahorros por no haberlos invertido. Es la diferencia entre lo que ahorraste y lo que realmente vale.</span>
+                                    </div>
+                                </dt>
+                                <dd class="font-bold text-red-600 text-base">-${formatCurrency(inflationLoss)}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                     <div class="p-4 rounded-lg bg-amber-100 text-amber-800 text-sm">
+                        <p><strong class="font-bold">Nota Importante:</strong> Esta proyección asume que tu aportación mensual (${formatCurrency(params.monthlyContribution)}) es constante. En la vida real, a medida que tus ingresos y ahorros aumenten, deberías volver a la calculadora para recalcular y aumentar tus aportaciones, ¡haciendo que tu crecimiento sea aún mayor!</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateChart(labels, nominalPatrimonyData, realPatrimonyData, inflationOnlyData) {
+            if (projectionChartInstance) {
+                projectionChartInstance.destroy();
+            }
+            const ctx = projectionChartCanvas.getContext('2d');
+            projectionChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Patrimonio Nominal (Bruto)',
+                        data: nominalPatrimonyData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: false,
+                        tension: 0.3
+                    }, {
+                        label: 'Poder de Compra Real (Neto)',
+                        data: realPatrimonyData,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: 'Ahorro Acumulado sin Invertir (Valor Real)',
+                        data: inflationOnlyData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: false,
+                        tension: 0.3,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value, index, ticks) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
