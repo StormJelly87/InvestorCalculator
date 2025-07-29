@@ -634,33 +634,68 @@
                         <p class="font-semibold text-gray-700">Resumen en ${years} años:</p>
                         <dl class="mt-2 space-y-2 text-sm">
                             <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Aportado a inversión (DCA)</dt>
+                                <dt class="text-gray-600 flex items-center">Aportado a inversión (DCA)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Suma de tu inversión inicial más todas las aportaciones periódicas (DCA) que has realizado. Es el total del dinero que ha salido de tu bolsillo hacia la inversión.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-semibold text-gray-900">${formatCurrency(totalDCContributions)}</dd>
                             </div>
                             <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Patrimonio Total (bruto)</dt>
+                                <dt class="text-gray-600 flex items-center">Patrimonio Total (bruto)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Esta es la cifra total que verías sumando tu cuenta de inversión, tu cuenta de ahorro y tu fondo de oportunidad al final del periodo, sin descontar el efecto de la inflación.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-semibold text-blue-600">${formatCurrency(finalNominalPatrimony)}</dd>
                             </div>
                             <hr class="my-2">
                             <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Poder de Compra Real (invirtiendo)</dt>
+                                <dt class="text-gray-600 flex items-center">Poder de Compra Real (invirtiendo)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">La cifra más importante. Representa cuánto vale realmente tu patrimonio total, pero 'traducido' al poder de compra que tiene el dinero hoy. Tiene en cuenta el efecto de la inflación.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-bold text-green-600 text-base">${formatCurrency(finalRealPatrimony)}</dd>
                             </div>
                              <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Ganancia Neta Real (vs. invertido)</dt>
+                                <dt class="text-gray-600 flex items-center">Ganancia Neta Real (vs. invertido)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Este es el beneficio real que has obtenido con tu estrategia. Se calcula restando el total que aportaste a la inversión de tu 'Poder de Compra Real'.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-bold text-green-600 text-base">${formatCurrency(realProfit)}</dd>
                             </div>
                             <hr class="my-2">
                              <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Poder de Compra Real (sólo ahorrando)</dt>
+                                <dt class="text-gray-600 flex items-center">Poder de Compra Real (sólo ahorrando)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Este es el poder de compra que tendría tu dinero si, en lugar de invertir, simplemente lo hubieras acumulado todo en una cuenta sin rentabilidad. Muestra el coste de la inacción.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-bold text-red-600 text-base">${formatCurrency(finalInflationOnlyValue)}</dd>
                             </div>
                              <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Poder de compra perdido (total)</dt>
+                                <dt class="text-gray-600 flex items-center">Poder de compra perdido (total)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Esta es la cantidad de valor que la inflación le ha 'robado' a tus ahorros por no haberlos invertido. Es la diferencia entre lo que ahorraste y lo que realmente vale al final.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-bold text-red-600 text-base">-${formatCurrency(inflationLoss)}</dd>
                             </div>
                              <div class="flex justify-between items-center">
-                                <dt class="text-gray-600">Pérdida anual promedio (por inflación)</dt>
+                                <dt class="text-gray-600 flex items-center">Pérdida anual promedio (por inflación)
+                                    <div class="info-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                                        <span class="tooltip">Es la media de poder de compra que habrías perdido cada año por culpa de la inflación al no invertir tu dinero.</span>
+                                    </div>
+                                </dt>
                                 <dd class="font-bold text-red-600 text-base">-${formatCurrency(annualInflationLoss)}</dd>
                             </div>
                         </dl>
